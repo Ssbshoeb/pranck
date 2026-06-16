@@ -320,6 +320,7 @@ function escapeReject() {
     rejectBtn.style.top   = rect.top  + 'px';
     rejectBtn.style.left  = rect.left + 'px';
     rejectBtn.style.width = rect.width + 'px';
+    document.body.appendChild(rejectBtn); // move out of backdrop-filter container
     rejectBtn.classList.add('escaped');
   }
 

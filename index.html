@@ -128,9 +128,11 @@
     background: rgba(255,255,255,0.08);
     color: var(--blush);
     border: 1px solid rgba(255,179,193,0.35);
-    position: fixed;   /* so we can place it anywhere on screen */
     transition: font-size 0.3s, padding 0.3s, opacity 0.3s;
     z-index: 20;
+  }
+  #btn-reject.escaped {
+    position: fixed;
   }
 
   /* ── Celebration overlay ── */
@@ -231,20 +233,10 @@
 
 /* ─── Reject button escape logic ─── */
 const rejectBtn = document.getElementById('btn-reject');
-let rejectScale = 1.0;   // shrinks each escape
 let escapeCount = 0;
 
-// Place reject button initially next to accept
-function initRejectPos() {
-  const wrap = document.querySelector('.btn-wrap');
-  const accept = document.getElementById('btn-accept');
-  const ar = accept.getBoundingClientRect();
-  rejectBtn.style.top  = ar.top  + 'px';
-  rejectBtn.style.left = (ar.right + 18) + 'px';
-}
-
 function getRandomPos() {
-  const margin = 80;
+  const margin = 60;
   const btnW = rejectBtn.offsetWidth  || 120;
   const btnH = rejectBtn.offsetHeight || 48;
   const x = margin + Math.random() * (window.innerWidth  - btnW - margin * 2);
@@ -254,25 +246,28 @@ function getRandomPos() {
 
 function escapeReject() {
   escapeCount++;
-  rejectScale = Math.max(0.38, rejectScale - 0.055);
+
+  // First escape: switch to fixed positioning
+  if (!rejectBtn.classList.contains('escaped')) {
+    const rect = rejectBtn.getBoundingClientRect();
+    rejectBtn.style.top  = rect.top  + 'px';
+    rejectBtn.style.left = rect.left + 'px';
+    rejectBtn.style.width = rect.width + 'px';
+    rejectBtn.classList.add('escaped');
+  }
+
   const { x, y } = getRandomPos();
   rejectBtn.style.left = x + 'px';
   rejectBtn.style.top  = y + 'px';
 
   const newSize = Math.max(0.55, 1 - escapeCount * 0.04);
-  rejectBtn.style.fontSize  = (newSize) + 'rem';
-  rejectBtn.style.padding   = (14 * newSize) + 'px ' + (36 * newSize) + 'px';
-  rejectBtn.style.opacity   = Math.max(0.35, 1 - escapeCount * 0.05);
+  rejectBtn.style.fontSize = newSize + 'rem';
+  rejectBtn.style.padding  = (14 * newSize) + 'px ' + (32 * newSize) + 'px';
+  rejectBtn.style.opacity  = Math.max(0.3, 1 - escapeCount * 0.05);
 }
 
 rejectBtn.addEventListener('mouseover', escapeReject);
 rejectBtn.addEventListener('touchstart', (e) => { e.preventDefault(); escapeReject(); }, { passive: false });
-
-window.addEventListener('load', () => {
-  // small delay so layout is settled
-  setTimeout(initRejectPos, 60);
-});
-window.addEventListener('resize', initRejectPos);
 
 /* ─── Accept button → celebration ─── */
 document.getElementById('btn-accept').addEventListener('click', celebrate);

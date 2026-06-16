@@ -412,21 +412,6 @@ function showScreen(id) {
   document.getElementById(id).classList.add('active');
 }
 
-/* ── Screen 1: Name ── */
-let userName = '';
-const nameInput = document.getElementById('name-input');
-const btnContinue = document.getElementById('btn-continue');
-
-nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') btnContinue.click(); });
-
-btnContinue.addEventListener('click', () => {
-  const val = nameInput.value.trim();
-  if (!val) { nameInput.focus(); nameInput.style.borderColor = '#ff4d6d'; return; }
-  userName = val;
-  document.getElementById('greeting-text').textContent = 'Hi ' + userName + '! 😊';
-  showScreen('screen-greeting');
-  setTimeout(() => showScreen('screen-question'), 2200);
-});
 
 
 /* ── Screen 3: Options + background change ── */

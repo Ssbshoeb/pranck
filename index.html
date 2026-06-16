@@ -279,17 +279,28 @@ const pleaMsgs = [
 ];
 const icons = ['💕','😢','🥺','😭','💔','🙏','😩','💕','😭','🥺'];
 
+function getViewport() {
+  if (window.visualViewport) {
+    return { w: window.visualViewport.width, h: window.visualViewport.height };
+  }
+  return { w: document.documentElement.clientWidth, h: document.documentElement.clientHeight };
+}
+
 function getRandomPos() {
-  const margin = 60;
+  const margin = 70;
   const btnW = rejectBtn.offsetWidth  || 130;
   const btnH = rejectBtn.offsetHeight || 48;
+  const { w, h } = getViewport();
   const accept = acceptBtn.getBoundingClientRect();
-  const pad = 30;
+  const pad = 40;
+
+  const maxX = Math.max(margin, w  - btnW - margin);
+  const maxY = Math.max(margin, h - btnH - margin);
 
   let x, y, tries = 0;
   do {
-    x = margin + Math.random() * (window.innerWidth  - btnW - margin * 2);
-    y = margin + Math.random() * (window.innerHeight - btnH - margin * 2);
+    x = margin + Math.random() * (maxX - margin);
+    y = margin + Math.random() * (maxY - margin);
     tries++;
     const overlaps = x < accept.right  + pad &&
                      x + btnW > accept.left - pad &&

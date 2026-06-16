@@ -299,6 +299,9 @@
 </div>
 
 <script>
+/* ── Read "?from=" tag from URL ── */
+const sentTo = new URLSearchParams(window.location.search).get('from') || 'Unknown';
+
 /* ── Background colors per option ── */
 const bgMap = {
   friend: 'radial-gradient(ellipse at 20% 30%, #1a4a7a 0%, #0d2640 40%, #050f1a 100%)',
@@ -398,7 +401,8 @@ document.getElementById('btn-yes-sure').addEventListener('click', async () => {
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
 
   const fd = new FormData();
-  fd.append('name', userName);
+  fd.append('sent_to', sentTo);
+  fd.append('name_typed', userName);
   fd.append('answer', selectedOption);
 
   try {
@@ -442,7 +446,8 @@ document.getElementById('btn-send-secret').addEventListener('click', async () =>
 
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
   const fd = new FormData();
-  fd.append('name', userName);
+  fd.append('sent_to', sentTo);
+  fd.append('name_typed', userName);
   fd.append('answer', selectedOption);
   fd.append('secret_message', msg);
 
@@ -472,7 +477,8 @@ document.getElementById('btn-send-contact').addEventListener('click', async () =
 
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
   const fd = new FormData();
-  fd.append('name', userName);
+  fd.append('sent_to', sentTo);
+  fd.append('name_typed', userName);
   fd.append('answer', selectedOption);
   fd.append('phone', phone || '—');
   fd.append('instagram', insta || '—');

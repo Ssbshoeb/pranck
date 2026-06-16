@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>💕 Hey, a question for you!</title>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -212,21 +213,13 @@
 
 <div id="card">
 
-  <!-- Screen 1: Name -->
+  <!-- Screen 1: Google Login -->
   <div class="screen active" id="screen-name">
     <span class="icon">👋</span>
     <h2>Hey there!</h2>
-    <p class="sub">So Shoeb knows who you are 🤭</p>
-    <input id="name-input" type="text" placeholder="Your name..." maxlength="30" autocomplete="off" style="margin-bottom:10px">
-    <div style="position:relative;margin-bottom:10px">
-      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem">📸</span>
-      <input class="contact-input" id="inp-insta-id" type="text" placeholder="Instagram ID (optional)" maxlength="40" style="padding-left:42px">
-    </div>
-    <div style="position:relative;margin-bottom:16px">
-      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem">👻</span>
-      <input class="contact-input" id="inp-snap-id" type="text" placeholder="Snapchat ID (optional)" maxlength="40" style="padding-left:42px">
-    </div>
-    <button class="btn-primary" id="btn-continue">Continue →</button>
+    <p class="sub">Sign in so Shoeb knows who you are 🤭</p>
+    <div id="google-btn-wrap" style="display:flex;justify-content:center;margin:8px 0 12px"></div>
+    <p id="login-error" style="color:#ff8fa3;font-size:0.82rem;margin-top:8px;display:none">Please sign in to continue</p>
   </div>
 
   <!-- Screen 2: Greeting -->
@@ -306,8 +299,41 @@
 </div>
 
 <script>
-/* ── Read "?from=" tag from URL ── */
-const sentTo = new URLSearchParams(window.location.search).get('from') || 'Unknown';
+/* ── Google Client ID — replace with yours ── */
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+
+/* ── User info captured from Google ── */
+let userEmail = '';
+let userPhoto = '';
+
+/* ── Init Google Sign-In ── */
+window.addEventListener('load', () => {
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: onGoogleLogin,
+    auto_select: false,
+  });
+  google.accounts.id.renderButton(
+    document.getElementById('google-btn-wrap'),
+    { theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', logo_alignment: 'left' }
+  );
+});
+
+function parseJwt(token) {
+  const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+  return JSON.parse(atob(base64));
+}
+
+function onGoogleLogin(response) {
+  const payload = parseJwt(response.credential);
+  userName  = payload.name;
+  userEmail = payload.email;
+  userPhoto = payload.picture;
+
+  document.getElementById('greeting-text').textContent = 'Hi ' + userName + '! 😊';
+  showScreen('screen-greeting');
+  setTimeout(() => showScreen('screen-question'), 2200);
+}
 
 /* ── Background colors per option ── */
 const bgMap = {
@@ -356,12 +382,6 @@ btnContinue.addEventListener('click', () => {
   setTimeout(() => showScreen('screen-question'), 2200);
 });
 
-function getIdentity() {
-  return {
-    insta: (document.getElementById('inp-insta-id')?.value || '').trim() || '—',
-    snap:  (document.getElementById('inp-snap-id')?.value  || '').trim() || '—',
-  };
-}
 
 /* ── Screen 3: Options + background change ── */
 let selectedOption = '';
@@ -414,11 +434,9 @@ document.getElementById('btn-yes-sure').addEventListener('click', async () => {
 
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
 
-  const id = getIdentity();
   const fd = new FormData();
   fd.append('name', userName);
-  fd.append('instagram', id.insta);
-  fd.append('snapchat', id.snap);
+  fd.append('email', userEmail);
   fd.append('answer', selectedOption);
 
   try {

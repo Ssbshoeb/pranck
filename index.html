@@ -72,7 +72,10 @@
     font-size: clamp(1.7rem, 5vw, 2.4rem);
     font-weight: 700; color: #fff; line-height: 1.25; margin-bottom: 10px;
     text-shadow: 0 2px 18px rgba(255,77,109,0.5);
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
   }
+  h1.visible { opacity: 1; transform: translateY(0); }
 
   /* pleading message */
   #plea {
@@ -95,7 +98,12 @@
   }
 
   /* ── Buttons ── */
-  .btn-wrap { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; align-items: center; }
+  .btn-wrap {
+    display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; align-items: center;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .btn-wrap.visible { opacity: 1; transform: translateY(0); }
 
   .btn {
     padding: 14px 36px; border-radius: 50px; border: none;
@@ -183,7 +191,7 @@
 
 <div id="card">
   <span class="main-icon" id="main-icon">💕</span>
-  <h1>Will You Be Mine?</h1>
+  <h1>Will You Be My bestfriend?</h1>
   <p id="plea">i have something important to ask you...</p>
   <p id="counter"></p>
 
@@ -214,6 +222,14 @@
     container.appendChild(el);
   }
 })();
+
+/* ── Staged reveal ── */
+setTimeout(() => {
+  document.querySelector('h1').classList.add('visible');
+}, 2200);
+setTimeout(() => {
+  document.querySelector('.btn-wrap').classList.add('visible');
+}, 3000);
 
 /* ── Reject escape logic ── */
 const rejectBtn   = document.getElementById('btn-reject');

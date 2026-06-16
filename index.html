@@ -397,13 +397,18 @@ document.getElementById('btn-yes-sure').addEventListener('click', async () => {
 
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
 
+  const fd = new FormData();
+  fd.append('name', userName);
+  fd.append('answer', selectedOption);
+
   try {
-    await fetch(FORMSPREE_URL, {
+    const res = await fetch(FORMSPREE_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ name: userName, answer: selectedOption }),
+      headers: { 'Accept': 'application/json' },
+      body: fd,
     });
-  } catch(e) {}
+    if (!res.ok) console.error('Formspree error:', await res.text());
+  } catch(e) { console.error('Fetch error:', e); }
 
   showResult();
 });
@@ -436,13 +441,13 @@ document.getElementById('btn-send-secret').addEventListener('click', async () =>
   btn.innerHTML = '<span class="spinner"></span>Sending...';
 
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
+  const fd = new FormData();
+  fd.append('name', userName);
+  fd.append('answer', selectedOption);
+  fd.append('secret_message', msg);
 
   try {
-    await fetch(FORMSPREE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ name: userName, answer: selectedOption, secret_message: msg }),
-    });
+    await fetch(FORMSPREE_URL, { method: 'POST', headers: { 'Accept': 'application/json' }, body: fd });
   } catch(e) {}
 
   btn.style.display = 'none';
@@ -466,19 +471,15 @@ document.getElementById('btn-send-contact').addEventListener('click', async () =
   btn.innerHTML = '<span class="spinner"></span>Sending...';
 
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
+  const fd = new FormData();
+  fd.append('name', userName);
+  fd.append('answer', selectedOption);
+  fd.append('phone', phone || '—');
+  fd.append('instagram', insta || '—');
+  fd.append('snapchat', snap || '—');
 
   try {
-    await fetch(FORMSPREE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({
-        name: userName,
-        answer: selectedOption,
-        phone: phone || '—',
-        instagram: insta || '—',
-        snapchat: snap || '—',
-      }),
-    });
+    await fetch(FORMSPREE_URL, { method: 'POST', headers: { 'Accept': 'application/json' }, body: fd });
   } catch(e) {}
 
   btn.style.display = 'none';

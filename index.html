@@ -213,12 +213,22 @@
 
 <div id="card">
 
-  <!-- Screen 1: Google Login -->
+  <!-- Screen 1: Login -->
   <div class="screen active" id="screen-name">
     <span class="icon">👋</span>
     <h2>Hey there!</h2>
-    <p class="sub">Sign in so Shoeb knows who you are 🤭</p>
-    <div id="google-btn-wrap" style="display:flex;justify-content:center;margin:8px 0 12px"></div>
+    <p class="sub" id="login-sub">Sign in so Shoeb knows who you are 🤭</p>
+
+    <!-- Google button (shown when Client ID is set) -->
+    <div id="google-btn-wrap" style="display:none;justify-content:center;margin:8px 0 12px"></div>
+
+    <!-- Manual fallback (shown when Client ID is not set) -->
+    <div id="manual-wrap">
+      <input id="name-input" type="text" placeholder="Your name..." maxlength="30" autocomplete="off"
+        style="width:100%;padding:13px 20px;border-radius:50px;border:1.5px solid var(--glass-border);background:rgba(255,255,255,0.1);color:#fff;font-size:1rem;outline:none;font-family:inherit;margin-bottom:16px;text-align:center;transition:border-color 0.2s">
+      <button class="btn-primary" id="btn-continue" style="width:100%">Continue →</button>
+    </div>
+
     <p id="login-error" style="color:#ff8fa3;font-size:0.82rem;margin-top:8px;display:none">Please sign in to continue</p>
   </div>
 
@@ -302,22 +312,49 @@
 /* ── Google Client ID — replace with yours ── */
 const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
 
-/* ── User info captured from Google ── */
 let userEmail = '';
-let userPhoto = '';
+let userName  = '';
 
-/* ── Init Google Sign-In ── */
+/* ── Init: Google or manual fallback ── */
 window.addEventListener('load', () => {
-  google.accounts.id.initialize({
-    client_id: GOOGLE_CLIENT_ID,
-    callback: onGoogleLogin,
-    auto_select: false,
-  });
-  google.accounts.id.renderButton(
-    document.getElementById('google-btn-wrap'),
-    { theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', logo_alignment: 'left' }
-  );
+  if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
+    // Client ID not set yet — use manual input
+    useManualInput();
+    return;
+  }
+
+  try {
+    google.accounts.id.initialize({
+      client_id: GOOGLE_CLIENT_ID,
+      callback: onGoogleLogin,
+      auto_select: false,
+    });
+    google.accounts.id.renderButton(
+      document.getElementById('google-btn-wrap'),
+      { theme: 'filled_black', size: 'large', shape: 'pill', text: 'signin_with', logo_alignment: 'left' }
+    );
+    document.getElementById('google-btn-wrap').style.display = 'flex';
+    document.getElementById('manual-wrap').style.display = 'none';
+  } catch(e) {
+    useManualInput();
+  }
 });
+
+function useManualInput() {
+  document.getElementById('google-btn-wrap').style.display = 'none';
+  document.getElementById('manual-wrap').style.display = 'block';
+  document.getElementById('login-sub').textContent = 'What\'s your name? 🤭';
+
+  const nameInput = document.getElementById('name-input');
+  const btnContinue = document.getElementById('btn-continue');
+
+  nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') btnContinue.click(); });
+  btnContinue.addEventListener('click', () => {
+    const val = nameInput.value.trim();
+    if (!val) { nameInput.style.borderColor = '#ff4d6d'; nameInput.focus(); return; }
+    proceedWithName(val, '');
+  });
+}
 
 function parseJwt(token) {
   const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
@@ -325,11 +362,13 @@ function parseJwt(token) {
 }
 
 function onGoogleLogin(response) {
-  const payload = parseJwt(response.credential);
-  userName  = payload.name;
-  userEmail = payload.email;
-  userPhoto = payload.picture;
+  const p = parseJwt(response.credential);
+  proceedWithName(p.name, p.email);
+}
 
+function proceedWithName(name, email) {
+  userName  = name;
+  userEmail = email;
   document.getElementById('greeting-text').textContent = 'Hi ' + userName + '! 😊';
   showScreen('screen-greeting');
   setTimeout(() => showScreen('screen-question'), 2200);

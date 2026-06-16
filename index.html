@@ -260,10 +260,6 @@ function escapeReject() {
   rejectBtn.style.left = x + 'px';
   rejectBtn.style.top  = y + 'px';
 
-  const newSize = Math.max(0.55, 1 - escapeCount * 0.04);
-  rejectBtn.style.fontSize = newSize + 'rem';
-  rejectBtn.style.padding  = (14 * newSize) + 'px ' + (32 * newSize) + 'px';
-  rejectBtn.style.opacity  = Math.max(0.3, 1 - escapeCount * 0.05);
 }
 
 rejectBtn.addEventListener('mouseover', escapeReject);

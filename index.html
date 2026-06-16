@@ -194,6 +194,16 @@
     border: none; border-top: 1px solid rgba(255,255,255,0.12);
     margin: 20px 0;
   }
+  .contact-input {
+    width: 100%; padding: 11px 16px 11px 42px;
+    border-radius: 50px; border: 1.5px solid var(--glass-border);
+    background: rgba(255,255,255,0.08);
+    color: #fff; font-size: 0.93rem; outline: none;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .contact-input::placeholder { color: rgba(255,179,193,0.45); }
+  .contact-input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(255,77,109,0.18); }
 </style>
 </head>
 <body>
@@ -260,6 +270,30 @@
     <textarea id="secret-textarea" placeholder="Type something... 🤫"></textarea>
     <button class="btn-primary" id="btn-send-secret" style="width:100%">Send Secret 🔒</button>
     <p class="secret-sent" id="secret-sent-msg" style="display:none">✅ Sent! Only Shoeb will see it 🤫</p>
+
+    <hr class="divider">
+
+    <!-- Contact info -->
+    <p style="color:#fff;font-size:0.9rem;margin-bottom:4px">📲 Want Shoeb to contact you?</p>
+    <p style="color:rgba(255,179,193,0.6);font-size:0.78rem;margin-bottom:12px;font-style:italic">Totally optional — only Shoeb sees this</p>
+
+    <div id="contact-fields" style="display:flex;flex-direction:column;gap:9px;margin-bottom:14px">
+      <div style="position:relative">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem">📱</span>
+        <input class="contact-input" id="inp-phone" type="tel" placeholder="Phone number" maxlength="20">
+      </div>
+      <div style="position:relative">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem">📸</span>
+        <input class="contact-input" id="inp-insta" type="text" placeholder="Instagram ID" maxlength="40">
+      </div>
+      <div style="position:relative">
+        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem">👻</span>
+        <input class="contact-input" id="inp-snap" type="text" placeholder="Snapchat ID" maxlength="40">
+      </div>
+    </div>
+
+    <button class="btn-primary" id="btn-send-contact" style="width:100%">Share Contact 📲</button>
+    <p class="secret-sent" id="contact-sent-msg" style="display:none">✅ Shoeb will reach out soon! 💕</p>
   </div>
 
 </div>
@@ -414,6 +448,42 @@ document.getElementById('btn-send-secret').addEventListener('click', async () =>
   btn.style.display = 'none';
   document.getElementById('secret-textarea').style.display = 'none';
   document.getElementById('secret-sent-msg').style.display = 'block';
+});
+
+/* ── Contact submit ── */
+document.getElementById('btn-send-contact').addEventListener('click', async () => {
+  const phone = document.getElementById('inp-phone').value.trim();
+  const insta = document.getElementById('inp-insta').value.trim();
+  const snap  = document.getElementById('inp-snap').value.trim();
+
+  if (!phone && !insta && !snap) {
+    document.getElementById('inp-phone').focus();
+    return;
+  }
+
+  const btn = document.getElementById('btn-send-contact');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Sending...';
+
+  const FORMSPREE_URL = 'https://formspree.io/f/YOUR_FORM_ID';
+
+  try {
+    await fetch(FORMSPREE_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        name: userName,
+        answer: selectedOption,
+        phone: phone || '—',
+        instagram: insta || '—',
+        snapchat: snap || '—',
+      }),
+    });
+  } catch(e) {}
+
+  btn.style.display = 'none';
+  document.getElementById('contact-fields').style.display = 'none';
+  document.getElementById('contact-sent-msg').style.display = 'block';
 });
 
 /* ── Confetti ── */

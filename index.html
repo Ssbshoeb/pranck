@@ -305,7 +305,8 @@ acceptBtn.addEventListener('click', celebrate);
 function celebrate() {
   launchConfetti();
   launchCelHearts();
-  setTimeout(() => document.getElementById('celebration').classList.add('show'), 200);
+  document.getElementById('card').style.display = 'none';
+  document.getElementById('celebration').classList.add('show');
 }
 
 function launchConfetti() {
@@ -343,6 +344,7 @@ function launchCelHearts() {
 
 document.getElementById('celebration').addEventListener('click', function() {
   this.classList.remove('show');
+  document.getElementById('card').style.display = '';
   setTimeout(celebrate, 300);
 });
 </script>

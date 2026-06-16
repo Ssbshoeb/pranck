@@ -283,10 +283,22 @@ function getRandomPos() {
   const margin = 60;
   const btnW = rejectBtn.offsetWidth  || 130;
   const btnH = rejectBtn.offsetHeight || 48;
-  return {
-    x: margin + Math.random() * (window.innerWidth  - btnW - margin * 2),
-    y: margin + Math.random() * (window.innerHeight - btnH - margin * 2),
-  };
+  const accept = acceptBtn.getBoundingClientRect();
+  const pad = 30;
+
+  let x, y, tries = 0;
+  do {
+    x = margin + Math.random() * (window.innerWidth  - btnW - margin * 2);
+    y = margin + Math.random() * (window.innerHeight - btnH - margin * 2);
+    tries++;
+    const overlaps = x < accept.right  + pad &&
+                     x + btnW > accept.left - pad &&
+                     y < accept.bottom + pad &&
+                     y + btnH > accept.top  - pad;
+    if (!overlaps) break;
+  } while (tries < 20);
+
+  return { x, y };
 }
 
 function escapeReject() {

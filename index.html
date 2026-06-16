@@ -216,9 +216,16 @@
   <div class="screen active" id="screen-name">
     <span class="icon">👋</span>
     <h2>Hey there!</h2>
-    <p class="sub">What's your name?</p>
-    <input id="name-input" type="text" placeholder="Enter your name..." maxlength="30" autocomplete="off">
-    <br>
+    <p class="sub">So Shoeb knows who you are 🤭</p>
+    <input id="name-input" type="text" placeholder="Your name..." maxlength="30" autocomplete="off" style="margin-bottom:10px">
+    <div style="position:relative;margin-bottom:10px">
+      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem">📸</span>
+      <input class="contact-input" id="inp-insta-id" type="text" placeholder="Instagram ID (optional)" maxlength="40" style="padding-left:42px">
+    </div>
+    <div style="position:relative;margin-bottom:16px">
+      <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:1.1rem">👻</span>
+      <input class="contact-input" id="inp-snap-id" type="text" placeholder="Snapchat ID (optional)" maxlength="40" style="padding-left:42px">
+    </div>
     <button class="btn-primary" id="btn-continue">Continue →</button>
   </div>
 
@@ -349,6 +356,13 @@ btnContinue.addEventListener('click', () => {
   setTimeout(() => showScreen('screen-question'), 2200);
 });
 
+function getIdentity() {
+  return {
+    insta: (document.getElementById('inp-insta-id')?.value || '').trim() || '—',
+    snap:  (document.getElementById('inp-snap-id')?.value  || '').trim() || '—',
+  };
+}
+
 /* ── Screen 3: Options + background change ── */
 let selectedOption = '';
 let selectedBg = '';
@@ -400,9 +414,11 @@ document.getElementById('btn-yes-sure').addEventListener('click', async () => {
 
   const FORMSPREE_URL = 'https://formspree.io/f/mlgkvwnz';
 
+  const id = getIdentity();
   const fd = new FormData();
-  fd.append('sent_to', sentTo);
-  fd.append('name_typed', userName);
+  fd.append('name', userName);
+  fd.append('instagram', id.insta);
+  fd.append('snapchat', id.snap);
   fd.append('answer', selectedOption);
 
   try {
